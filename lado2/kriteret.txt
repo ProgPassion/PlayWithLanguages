@@ -1,0 +1,4 @@
+1. Admin duhet te kete tre search bar: Turqisht, Anglisht, Shqip
+Nqs ben kerkimin tek njeri prej search bar-eve pergjigja e kerkuar duhet te dali ne te tre gjuhet..
+2. Shprehjet ndahen ne kategori per lehtesim kerkimi.. mundet qe nje shprehje te jete pjese e me shume se nje kategorije
+3. Admini duhet te kete mundesine te shtoje kategorite, te heqe ose te modifikoje shprehjet si nga permbajtja edhe nga kategorija
