@@ -2,6 +2,7 @@
 
 	ini_set('display_errors', '1');
 	require_once 'db_connection.php';
+	require_once 'functions.php';
 
 	$phraseId 	 = null;
 	$categoryId  = null;
@@ -15,302 +16,192 @@
 	if(isset($_SESSION['username'])){
 
 		$_SESSION['open'] = true;
-		if(isset($_GET['logout'])){
-			if($_GET['logout'] == 1){
+		if(isset($_GET['logout']) && $_GET['logout'] == 1){
 				
 				destroy_session_and_data();
-				header('Location: /lado2/');
-			}
+				header('Location: .');
 		}
-    	if(isset($_POST['page_form'])){
+	}
+	else header('Location: .');
 
-			switch ($_POST['page_form'])
-		    {
-		    case "1": 
-		    	if (!empty($_POST['shqip']) && !empty($_POST['turqisht']) && !empty($_POST['anglisht'])){
-					$shqip    = addslashes($_POST['shqip']);
-					$turqisht = addslashes($_POST['turqisht']);
-					$anglisht = addslashes($_POST['anglisht']);
+    if(isset($_POST['page_form'])) {
 
-					queryExecute("INSERT INTO phrase(shqip, turqisht, anglisht) VALUES('$shqip', '$turqisht', '$anglisht')", false);
-					$result   = queryExecute("SELECT id FROM phrase ORDER BY id DESC LIMIT 1", true);
-					$phraseId = $result[0];
-				}
+		switch ($_POST['page_form']) {
+	    case "1": 
+	    	
+	    	AdminInsertPanel_check();
+		    break; //Break if the first case is matched..
+		case "2": 
 
-				if (!empty($_POST['newCateg']) && !empty($_POST['categName'])){
-					$categName  = addslashes($_POST['categName']);
-					$categoryId = createNewCategori($categName, true);	
-				}
-				elseif (!empty($_POST['kategori'])){
-					$categoryId = addslashes($_POST['kategori']);
-				}
-				else {
-					$categoryId = 1;
-				}
+		    AdminSearchPanel_check();
+		    break; //Break if the second case is matched..
+	    case "3":
+		    
+		    AdminModifyPanel_check();	
+		    break; //Break if the third case is matched..
+	    case "4":
 
-				if (isset($_FILES['pic']['name']) && !empty($_POST['img-name']) && !is_null($phraseId) && !is_null($categoryId)){
-					imgUpload('pic');
-				}
+	    	AdminModifyCategPanel_check();
+	    	break; //Break if the forth case is matched..
+	    default:
+	        die ("Go back and Refresh The Page<br>or Close the page and open it again");
+	    }
+	}
 
-				if(!is_null($phraseId)){
-					link_tables($phraseId, $categoryId, $imageId);
-				}
+	function AdminInsertPanel_check() {
 
-		        break; //Break if the first case is matched..
-		    case "2": 
-		    	if(!empty($_POST['search_shqip_mod']) || !empty($_POST['search_ang_mod']) || !empty($_POST['search_turq_mod'])){
+		global $phraseId, $categoryId, $imageId;
+
+		if (!empty($_POST['shqip']) && !empty($_POST['turqisht']) && !empty($_POST['anglisht'])){
+			$shqip    = addslashes($_POST['shqip']);
+			$turqisht = addslashes($_POST['turqisht']);
+			$anglisht = addslashes($_POST['anglisht']);
+
+			queryExecute("INSERT INTO phrase(shqip, turqisht, anglisht) VALUES('$shqip', '$turqisht', '$anglisht')");
+			$result   = queryExecute("SELECT id FROM phrase ORDER BY id DESC LIMIT 1");
+			$row 	  = $result->fetch_array(MYSQLI_NUM);
+			$phraseId = $row[0]; 
+		}
+
+		if (!empty($_POST['newCateg']) && !empty($_POST['categName'])){
+			$categName  = addslashes($_POST['categName']);
+			$categoryId = createNewCategori($categName, true);	
+		}
+		elseif (!empty($_POST['kategori'])){
+			$categoryId = addslashes($_POST['kategori']);
+		}
+		else {
+			$categoryId = 1;
+		}	
+
+		if (isset($_FILES['pic']['name']) && !empty($_POST['img-name']) && !is_null($phraseId) && !is_null($categoryId)){
+			imgUpload('pic');
+		}
+
+		if(!is_null($phraseId)){
+			link_tables($phraseId, $categoryId, $imageId);
+		}
+	}
+
+	function AdminSearchPanel_check() {
+
+		global $jsonValue;
+
+		if(!empty($_POST['search_shqip_mod']) || !empty($_POST['search_ang_mod']) || !empty($_POST['search_turq_mod'])){
 				
-					$shqip = addslashes($_POST['search_shqip_mod']);
-					$ang   = addslashes($_POST['search_ang_mod']);
-					$turq  = addslashes($_POST['search_turq_mod']);
+			$shqip = addslashes($_POST['search_shqip_mod']);
+			$ang   = addslashes($_POST['search_ang_mod']);
+			$turq  = addslashes($_POST['search_turq_mod']);
 
-					$phrases   = array(array("shqip", $shqip), array("anglisht", $ang), array("turqisht", $turq));
-					$jsonValue = linkingTableModify($phrases);
-				}
-		        break; //Break if the second case is matched..
-		    case "3":
-		    	if(isset($_POST['modify_phrase_id'])){
+			$phrases   = array(array("shqip", $shqip), array("anglisht", $ang), array("turqisht", $turq));
+			$jsonValue = linkingTableModify($phrases);
+		}
+	}
+
+	function AdminModifyPanel_check() {
+
+		global $phraseId, $categoryId, $imageId;
+
+		if(isset($_POST['modify_phrase_id'])){
 	
-		    		$phrase_id = $_POST['modify_phrase_id'];
-		    		
-		    		$id_result_img = queryExecute("SELECT images.id FROM extra_info LEFT JOIN kategorite ON extra_info.kategori_id=kategorite.id LEFT JOIN images ON extra_info.images_id=images.id RIGHT JOIN phrase ON phrase.id=extra_info.phrase_id WHERE phrase.id=$phrase_id", true);
+	    	$phraseId = $_POST['modify_phrase_id'];
+	    		
+	    	$result = queryExecute("SELECT images.id FROM extra_info LEFT JOIN kategorite ON extra_info.kategori_id=kategorite.id LEFT JOIN images ON extra_info.images_id=images.id RIGHT JOIN phrase ON phrase.id=extra_info.phrase_id WHERE phrase.id=$phraseId");
+	    	$row = $result->fetch_array(MYSQLI_NUM);
+	    	$id_result_img = $row[0];
 
-				    if(isset($_POST['fshi'])) {
+			if(isset($_POST['fshi'])) {
 
-				    	queryExecute("DELETE FROM phrase WHERE id=$phrase_id", false); //delete all the phrases that are related to each other from DB
-				    	queryExecute("DELETE FROM extra_info WHERE phrase_id=$phrase_id", false); //delete the row with ids of different table that are connected with the phrase
-				    	if(!is_null($id_result_img[0])) {$img_id = $id_result_img[0]; queryExecute("DELETE FROM images WHERE id=$img_id", false);} 
-				    		//delete from table images if there exists any image related to phrases that are deleted;
-				    }
-				    else {
+			    if(!is_null($id_result_img)) {
+			    	$img_id = $id_result_img; 
+			    	$img_name = "phrase_images_related/image$img_id.jpg";
 
-				    	if(!empty($_POST['shqip_mod']) && !empty($_POST['turq_mod']) && !empty($_POST['ang_mod'])) {
+			    	if(preg_match('/^phrase_images_related\/image\d+.jpg$/', $img_name)){
+			    		queryExecute("DELETE FROM images WHERE id=$img_id");
+			    		$img_name = "phrase_images_related/image$img_id.jpg";
+			    		unlink($img_name);
+			    	}
+			    	else die("Don't try to modify the html code1!!!<br>Go Back again.");
+			    }
+			    queryExecute("DELETE FROM phrase WHERE id=$phraseId"); //delete all the phrases that are related to each other from DB
+			    queryExecute("DELETE FROM extra_info WHERE phrase_id=$phraseId"); //delete the row with ids of different table that are connected with the phrase
+			    	 
+			    //delete from table images if there exists any image related to phrases that are deleted;
+			}
+			else {
 
-				    		$shqip = addslashes($_POST['shqip_mod']);
-							$ang   = addslashes($_POST['ang_mod']);
-							$turq  = addslashes($_POST['turq_mod']);
+			    if(!empty($_POST['shqip_mod']) && !empty($_POST['turq_mod']) && !empty($_POST['ang_mod'])) {
 
-							$phrases = array(array("shqip", $shqip), array("anglisht", $ang), array("turqisht", $turq));
-							for($i=0; $i<sizeof($phrases); $i++)
-								queryExecute("UPDATE phrase SET " . $phrases[$i][0] . "='" . $phrases[$i][1] . "'" .  "WHERE id=$phrase_id", false);
-							
-				    	}
+			    	$shqip = addslashes($_POST['shqip_mod']);
+					$ang   = addslashes($_POST['ang_mod']);
+					$turq  = addslashes($_POST['turq_mod']);
 
-			    		if (!empty($_POST['kategori_mod'])){
-
-							$categoryId = addslashes($_POST['kategori_mod']);
-							queryExecute("UPDATE extra_info SET kategori_id=$categoryId WHERE phrase_id=$phrase_id", false);
-						}
+					$phrases = array(array("shqip", $shqip), array("anglisht", $ang), array("turqisht", $turq));
+					for($i=0; $i<sizeof($phrases); $i++)
+						queryExecute("UPDATE phrase SET " . $phrases[$i][0] . "='" . $phrases[$i][1] . "'" .  "WHERE id=$phraseId");
 						
-				    	if(!is_null($id_result_img[0])){
-							$img_id   = $id_result_img[0];
-							$img_name = "phrase_images_related/image$img_id.jpg";
-						
-							if (empty($_POST['img-name_mod'])){
-								
-								if(preg_match('/^phrase_images_related\/image\d+.jpg$/', $img_name)){
-									queryExecute("DELETE FROM images WHERE id='$img_id'", false);
-									queryExecute("UPDATE extra_info SET images_id=NULL WHERE images_id='$img_id'", false);
-									unlink($img_name);	
-								}
-								else die("Don't try to modify the html code1!!!<br>Go Back again.");
-							}
-							elseif (!empty($_FILES['pic_mod']['name'])){
-							
-								if(preg_match('/^phrase_images_related\/image\d+.jpg$/', $img_name)){
-									queryExecute("DELETE FROM images WHERE id='$img_id'", false);
-									unlink($img_name);
-									imgUpload('pic_mod');
-									queryExecute("UPDATE extra_info SET images_id=$imageId WHERE images_id=$img_id", false);
-								}
-								else die("Don't try to modify the html code2!!!<br>Go Back again.");
-							}
-							else {
-								$imgName = $_POST['img-name_mod'];
-								queryExecute("UPDATE images SET name='$imgName' WHERE id=$img_id", false); 
-							}
-						}
-						elseif (!empty($_FILES['pic_mod']['name']) && !empty($_POST['img-name_mod'])){
+			    }
 
+		    	if (!empty($_POST['kategori_mod'])){
+
+					$categoryId = addslashes($_POST['kategori_mod']);
+					queryExecute("UPDATE extra_info SET kategori_id=$categoryId WHERE phrase_id=$phraseId");
+				}
+					
+			    if(!is_null($id_result_img)){
+					$img_id   = $id_result_img;
+					$img_name = "phrase_images_related/image$img_id.jpg";
+					
+					if (empty($_POST['img-name_mod'])){
+							
+						if(preg_match('/^phrase_images_related\/image\d+.jpg$/', $img_name)){
+							queryExecute("DELETE FROM images WHERE id='$img_id'");
+							queryExecute("UPDATE extra_info SET images_id=NULL WHERE images_id='$img_id'");
+							unlink($img_name);	
+						}
+						else die("Don't try to modify the html code1!!!<br>Go Back again.");
+					}
+					elseif (!empty($_FILES['pic_mod']['name'])){
+						
+						if(preg_match('/^phrase_images_related\/image\d+.jpg$/', $img_name)){
+							queryExecute("DELETE FROM images WHERE id='$img_id'");
+							unlink($img_name);
 							imgUpload('pic_mod');
-							queryExecute("UPDATE extra_info SET images_id=$imageId WHERE phrase_id=$phrase_id", false);
-						}	
-				    }	
-		    	}
-		    	else die("Don't try to modify the html code!!!<br>Go Back again.");
-		    	
-		    	break; //Break if the third case is matched..
-		    case "4":
-		    	if(!empty($_POST['kategori-mod_entity'])) {
-
-		    		$categoriId = $_POST['kategori-mod_entity'];
-		    		if(isset($_POST['categ-delete-butt'])) {
-		    			queryExecute("DELETE FROM kategorite WHERE id=$categoriId", false);
-		    			queryExecute("UPDATE extra_info SET kategori_id=1 WHERE kategori_id=$categoriId", false);
-		    		}
-		    		elseif(!empty($_POST['categ-modify-name'])){
-		    			$newCategoriName = $_POST['categ-modify-name'];
-		    			queryExecute("UPDATE kategorite SET kategoria='$newCategoriName' WHERE id=$categoriId", false);
-		    		}
-		    	}
-		    	break; //Break if the forth case is matched..
-		    default:
-		        die ("Go back and Refresh The Page<br>or Close the page and open it again");
-		    }
-		}
-	}
-	else header('Location: /lado2/');
-
-	
-		
-
-	
-	function imgUpload($upload_file_input) {
-
-		global $phraseId;
-		$typeok = TRUE;
-
-		if(isset($_POST['img-name']))
-			$tmp_name = $_POST['img-name'];
-		else
-			$tmp_name = $_POST['img-name_mod'];
-
-		switch ($_FILES[$upload_file_input]['type']) {
-			case 'image/jpeg': $name = createImageName($tmp_name, $upload_file_input); $src = imagecreatefromjpeg($name); break;
-			case 'image/gif' : $name = createImageName($tmp_name, $upload_file_input); $src = imagecreatefromgif($name); break;
-			case 'image/png' : $name = createImageName($tmp_name, $upload_file_input); $src = imagecreatefrompng($name); break;
-			default 		 : $typeok = FALSE;	 break;
-		}
-			
-		if($typeok) {
-					
-			list($w, $h) = getimagesize($name);
-
-			$max = 100;
-			$tw  = $w;
-			$th  = $h;
-
-			if ($w > $h && $max < $w) {
-				$th = $max / $w * $h;
-				$tw = $max;
-			}
-			elseif ($h > $w && $max < $h) {
-				$tw = $max / $h * $w;
-				$th = $max;
-			}
-			elseif ($max < $w) {
-				$tw = $th = $max;
-			}
-
-			$tmp = imagecreatetruecolor($tw, $th);
-			imagecopyresampled($tmp, $src, 0, 0, 0, 0, $tw, $th, $w, $h);
-			imageconvolution($tmp, array(array(-1, -1, -1), array(-1, 16, -1), array(-1, -1, -1)), 8, 0);
-			imagejpeg($tmp, $name);
-			imagedestroy($tmp);
-			imagedestroy($src);
-		}
-		else{
-			$img_warning = "Imazhi qe upload-uat nuk eshte nje file i pranueshem!\nFormatet e pranueshme jane jpg, png ose giff.\nGjithashtu upload-oni serish informacioni per frazat e sapo futura ose kategorine e tyre.";
-			if(!is_null($phraseId)) {queryExecute("DELETE FROM phrase WHERE id=$phraseId", false); $phraseId = null;}
-		}
-	}
-
-	function createImageName($tmp_name, $name_file_input) {
-
-		global $imageId;
-
-		$imgNickname = addslashes($tmp_name);
-		queryExecute("INSERT INTO images(name) VALUES('$imgNickname')", false);
-		$result = queryExecute("SELECT id FROM images ORDER BY id DESC LIMIT 1", true);
-		$imageId = $result[0];
-		$name = "phrase_images_related/image$imageId.jpg";
-		move_uploaded_file($_FILES[$name_file_input]['tmp_name'], $name);
-		return $name;
-	}
-	
-	function getCategories() {
-
-		$result = queryExecute("SELECT * FROM kategorite", true);
-		$rows = $result[1];
-		$jsonCategArray = array();
-		for($i=0; $i<$rows; $i++) {
-			$result[0]->data_seek($i);
-			$row = $result[0]->fetch_array(MYSQLI_NUM);
-			array_push($jsonCategArray, $row);
-		}
-		return json_encode($jsonCategArray);
-	}
-	
-	function createNewCategori($name, $n_c_n_ph){
-		queryExecute("INSERT INTO kategorite(kategoria) VALUES('$name')", false);
-		if($n_c_n_ph){
-			$result = queryExecute("SELECT id FROM kategorite ORDER BY id DESC LIMIT 1", true);
-			return $result[0];
-		}
-	}
-	function link_tables($phraseId, $categoryId, $imageId) {
-		queryExecute("INSERT INTO extra_info(phrase_id, kategori_id, images_id) VALUES('$phraseId', '$categoryId', '$imageId')", false);
-	} 
-
-
-	function linkingTableModify($phrases) {
-
-		$jsonReady = 0;
-		$staticQueryString = "SELECT phrase.id,phrase.shqip,phrase.turqisht,phrase.anglisht,kategorite.kategoria,images.name FROM extra_info LEFT JOIN kategorite ON extra_info.kategori_id=kategorite.id LEFT JOIN images ON extra_info.images_id=images.id RIGHT JOIN phrase ON phrase.id=extra_info.phrase_id";
-
-		if(!is_null($phrases)){
-			for($i=0; $i<3; $i++) {
-				if(!empty($phrases[$i][1])){
-					$language = $phrases[$i][0];
-					$input = $phrases[$i][1];
-					
-					$row = queryExecute("$staticQueryString WHERE phrase.$language LIKE '%$input%'", true);
-					$jsonReady = showResult($row);
-					break;
+							queryExecute("UPDATE extra_info SET images_id=$imageId WHERE images_id=$img_id");
+						}
+						else die("Don't try to modify the html code2!!!<br>Go Back again.");
+					}
+					else {
+						$imgName = $_POST['img-name_mod'];
+						queryExecute("UPDATE images SET name='$imgName' WHERE id=$img_id", false); 
+					}
 				}
-			}
-		}
-		return json_encode($jsonReady);
+				elseif (!empty($_FILES['pic_mod']['name']) && !empty($_POST['img-name_mod'])){
+
+					imgUpload('pic_mod');
+					queryExecute("UPDATE extra_info SET images_id=$imageId WHERE phrase_id=$phraseId");
+				}	
+			}	
+	    }
+	    else die("Don't try to modify the html code!!!<br>Go Back again.");
 	}
 
-	function showResult($info) {
+	function AdminModifyCategPanel_check() {
 
-		$jsonResultArray = array();
-		if(is_object($info[0])) {
-			// $row[0] is object meaning that the input value matched more than one phrase in DataBase
-			
-			for($i=0; $i<$info[1]; $i++) {
-				$info[0]->data_seek($i);
-				$row = $info[0]->fetch_array(MYSQLI_NUM);
-				array_push($jsonResultArray, $row);
-			}
-		}
-		elseif(is_array($info)) {
-			// $row[0] is array meaning that the input value matched with only one phrase in DataBase
-			array_push($jsonResultArray, $info);
-		}
-		return $jsonResultArray;
-	}
+		global $categoriId;
 
-	function queryExecute($query, $resultFlag) {
-	
-		global $conn;
-		$result = $conn->query($query);
-		if(!$result) die($conn->error);
-		
-		if($resultFlag && is_object($result)){
-			$rows = $result->num_rows; 
+		if(!empty($_POST['kategori-mod_entity'])) {
 
-			if($rows === 1){
-				$row = $result->fetch_array(MYSQLI_NUM);
-				return $row;
-			}
-			elseif ($rows > 1){
-				return [$result, $rows];
-			}
-		}
-		elseif($resultFlag)
-			return 0;	
+    		$categoriId = $_POST['kategori-mod_entity'];
+    		if(isset($_POST['categ-delete-butt'])) {
+    			queryExecute("DELETE FROM kategorite WHERE id=$categoriId");
+    			queryExecute("UPDATE extra_info SET kategori_id=1 WHERE kategori_id=$categoriId");
+    		}
+    		elseif(!empty($_POST['categ-modify-name'])){
+    			$newCategoriName = $_POST['categ-modify-name'];
+    			queryExecute("UPDATE kategorite SET kategoria='$newCategoriName' WHERE id=$categoriId");
+    		}
+    	}
 	}
 
 	function destroy_session_and_data(){
@@ -782,7 +673,7 @@
 		</div>
 	</div>
 	<script type="text/javascript">
-		<?php echo "var myJSON = " . getCategories() . ";\nvar myJSONphrases = " . $jsonValue . ";\nvar imgWarning = '" . $img_warning . "';\n"; ?>
+		<?php echo "var myJSON = " . getCategories() . ";\n\t\tvar myJSONphrases = " . $jsonValue . ";\n\t\tvar imgWarning = '" . $img_warning . "';\n"; ?>
 		
 		if (imgWarning.length > 0) {alert(imgWarning);}
 		var categoryIds = ["list-kategori", "kategori-mod_entity"];
@@ -1037,13 +928,13 @@
 			
 
 			if(shqip.length === 0)    {document.getElementById("wrg-shq-input").style.display = "block"; inpNCDetect = true;}
-			if(turqisht.length === 0) {document.getElementById("wrg-tq-input").style.display = "block"; inpNCDetect = true;}
-			if(anglisht.length === 0) {document.getElementById("wrg-en-input").style.display = "block"; inpNCDetect = true;}
+			if(turqisht.length === 0) {document.getElementById("wrg-tq-input").style.display  = "block"; inpNCDetect = true;}
+			if(anglisht.length === 0) {document.getElementById("wrg-en-input").style.display  = "block"; inpNCDetect = true;}
 
-			if(!checkbox && nCategName.length > 0)  {document.getElementById("wrg-chk-apr").style.display = "block"; inpNCDetect = true;}
+			if(!checkbox && nCategName.length > 0)  {document.getElementById("wrg-chk-apr").style.display    = "block"; inpNCDetect = true;}
 			if(checkbox && nCategName.length === 0) {document.getElementById("wrg-categ-name").style.display = "block"; inpNCDetect = true;}
 			
-			if(imgUp.length === 0 && imgName.length > 0) {document.getElementById("wrg-zgjidh-img").style.display = "block"; inpNCDetect = true;}
+			if(imgUp.length === 0 && imgName.length > 0) {document.getElementById("wrg-zgjidh-img").style.display  = "block"; inpNCDetect = true;}
 			if(imgUp.length > 0 && imgName.length === 0) {document.getElementById("wrg-emerto-img1").style.display = "block"; inpNCDetect = true;}
 			
 
