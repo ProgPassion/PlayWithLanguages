@@ -1,14 +1,11 @@
 <?php
 	
 	require_once 'db_connection.php';
-
+	require_once 'functions.php';
 
 	$phrases    = null;
 	$kategoriId = null;
-	$imageId    = null;
-
-	$jsonCategArray = array();
-	$jsonImagesArray = array(); 
+	$imageId    = null; 
 
 	if(!empty($_POST['search_shqip']) || !empty($_POST['search_ang']) || !empty($_POST['search_turq'])){
 		
@@ -28,149 +25,12 @@
 	if(!empty($_POST['img_name'])){
 		
 		$imgName = addslashes($_POST['img_name']);
-		$row = queryExecute("SELECT id FROM images WHERE name='$imgName'", true);
+		$result = queryExecute("SELECT id FROM images WHERE name='$imgName'");
+		$row = $result->fetch_array(MYSQLI_NUM);
 		$imageId = $row[0];
 	}
 
 	$jsonValue = linkingTableInfo($phrases, $kategoriId, $imageId);  //The main variabel that holds all info for displaying in result front end!!!
-
-	function linkingTableInfo($phrases, $kategoriId, $imageId) {
-
-		$jsonReady = 0;
-		$staticQueryString = "SELECT phrase.shqip,phrase.turqisht,phrase.anglisht,kategorite.kategoria,images.name FROM extra_info LEFT JOIN kategorite ON extra_info.kategori_id=kategorite.id LEFT JOIN images ON extra_info.images_id=images.id RIGHT JOIN phrase ON phrase.id=extra_info.phrase_id";
-
-		if(!is_null($phrases) && is_null($kategoriId) && is_null($imageId)) {
-			
-			for($i=0; $i<3; $i++) {
-				if(!empty($phrases[$i][1])){
-					$language = $phrases[$i][0];
-					$input = $phrases[$i][1];
-					
-					$row = queryExecute("$staticQueryString WHERE phrase.$language LIKE '%$input%'", true);
-					
-					$jsonReady = showResult($row);
-					
-					break;
-				}
-			}
-		}
-		elseif(!is_null($phrases) && !is_null($kategoriId) && is_null($imageId)){
-			
-			for($i=0; $i<3; $i++) {
-				if(!empty($phrases[$i][1])){
-					$language = $phrases[$i][0];
-					$input = $phrases[$i][1];
-					$row = queryExecute("$staticQueryString WHERE phrase.$language LIKE '%$input%' AND extra_info.kategori_id=$kategoriId", true);
-					$jsonReady = showResult($row);
-					break;
-				}
-			}
-		}
-		elseif (!is_null($phrases) && is_null($kategoriId) && !is_null($imageId)) {
-			
-			for($i=0; $i<3; $i++) {
-				if(!empty($phrases[$i][1])){
-					$language = $phrases[$i][0];
-					$input = $phrases[$i][1];
-					$row = queryExecute("$staticQueryString WHERE phrase.$language LIKE '%$input%' AND extra_info.images_id=$imageId", true);
-					$jsonReady = showResult($row);
-					break;
-				}
-			}
-		}
-		elseif (!is_null($phrases) && !is_null($kategoriId) && !is_null($imageId)) {
-			
-			for($i=0; $i<3; $i++) {
-				if(!empty($phrases[$i][1])){
-					$language = $phrases[$i][0];
-					$input = $phrases[$i][1];
-					$row = queryExecute("$staticQueryString WHERE phrase.$language LIKE '%$input%' AND extra_info.kategori_id=$kategoriId AND extra_info.images_id=$imageId", true);
-					$jsonReady = showResult($row);
-					var_dump($jsonReady);
-					break;
-				}
-			}	
-		}
-		elseif (is_null($phrases) && !is_null($kategoriId) && is_null($imageId)) {
-
-			$row = queryExecute("$staticQueryString WHERE extra_info.kategori_id=$kategoriId", true);
-			$jsonReady = showResult($row);
-		}
-		elseif (is_null($phrases) && !is_null($kategoriId) && !is_null($imageId)) {
-			
-			$row = queryExecute("$staticQueryString WHERE extra_info.kategori_id=$kategoriId AND extra_info.images_id=$imageId", true);
-			$jsonReady = showResult($row);
-		}
-		elseif (is_null($phrases) && is_null($kategoriId) && !is_null($imageId)) {
-			
-			$row = queryExecute("$staticQueryString WHERE extra_info.images_id=$imageId", true);
-			$jsonReady = showResult($row);
-		}
-
-		return json_encode($jsonReady);
-	}
-		
-
-	function showResult($info) {
-
-		$jsonResultArray = array();
-
-		if(is_object($info[0])) {
-			// $row[0] is object meaning that the input value matched more than one phrase in DataBase
-			
-			for($i=0; $i<$info[1]; $i++) {
-				$info[0]->data_seek($i);
-				$row = $info[0]->fetch_array(MYSQLI_NUM);
-				array_push($jsonResultArray, $row);
-			}
-		}
-		elseif(is_array($info)) {
-			// $row[0] is array meaning that the input value matched with only one phrase in DataBase
-			array_push($jsonResultArray, $info);
-		}
-
-		return $jsonResultArray;
-	}
-
-
-	function queryExecute($query, $resultFlag) {
-	
-		global $conn;
-		$result = $conn->query($query);
-		if(!$result) die($conn->error);
-		
-		if($resultFlag && is_object($result)){
-			$rows = $result->num_rows; 
-
-			if($rows === 1){
-				$row = $result->fetch_array(MYSQLI_NUM);
-				return $row;
-			}
-			elseif ($rows > 1){
-				return [$result, $rows];
-			}
-		}
-		elseif($resultFlag)
-			return 0;	
-	}
-
-	function listImg() {
-
-		global $jsonImagesArray;
-
-		$result = queryExecute("SELECT * FROM images", true);
-		$jsonImagesArray = showResult($result);
-		return json_encode($jsonImagesArray);
-	}
-
-	function getCategories() {
-
-		global $jsonCategArray;
-
-		$result = queryExecute("SELECT * FROM kategorite", true);
-		$jsonCategArray = showResult($result);
-		return json_encode($jsonCategArray);
-	}
 
 ?>
 <!DOCTYPE html>
@@ -232,13 +92,18 @@
 			overflow: hidden;
 
 		}
-		div.first-line-bck a {
+
+		a {
 			text-decoration: none;
 			display: inline-block;
+			font-family: 'Roboto' , sans-serif;
+		}
+
+		div.first-line-bck a {
+			
 			float: right;
 			margin-right: 30px;
 			margin-top: 20px;
-			font-family: 'Roboto' , sans-serif;
 			font-size: 24px;
 			vertical-align: text-bottom;
 		}
@@ -436,7 +301,7 @@
 <!--<?php //echo $jsonValue; ?>-->
 	<div class="wrap">
 			<div class="wrapper">
-				<div class="first-line-ttl"><h1 class="tlt">User Panel</h1></div><div class="first-line-bck"><a href="/lado/">Shko Prapa</a></div>
+				<div class="first-line-ttl"><h1 class="tlt">User Panel</h1></div><div class="first-line-bck"><a href=".">Shko Prapa</a></div>
 				<hr class="style">
 				<p class="explain">Zgjidh kategorine(opsionale) dhe gjuhen per shprehjen ose fjalen qe kerkoni.</p>
 				<div class="container">
