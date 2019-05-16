@@ -11,7 +11,7 @@ echo
 
 echo "During installation the script will prompt for entering the root password account of mysql."
 
-mysql -u root -p -e "CREATE DATABASE lado_test"
+mysql -u root -p -e "CREATE DATABASE lado"
 
 mysql -D lado_test -u root -p < lado_db.sql
 
