@@ -38,7 +38,24 @@
 <head>
 	<title>User</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Lato" rel="stylesheet"> 
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
 	<style type="text/css">
+		html, .wrap {
+			min-height: 650px;
+		}
+		.optional {
+			width: 66.6666666%;
+			padding: 10px 80px 10px 10px;
+		}
+		.explain {
+			line-height: 32px;
+		}
+		#infoOnClick tr:nth-child(2) {
+			background-color: #f2f2f2;
+			color: #000;
+		}
+	</style>
+	<!--<style type="text/css">
 		* {
 			margin: 0;
 			padding: 0;
@@ -295,7 +312,7 @@
 		    color: white;
 		    font-size: 20px;
 		}
-	</style>
+	</style>-->
 </head>
 <body>
 <!--<?php //echo $jsonValue; ?>-->
