@@ -4,12 +4,13 @@
 	require_once 'db_connection.php';
 	require_once 'functions.php';
 
-	$phraseId 	 = null;
-	$categoryId  = null;
-	$imageId 	 = null;
+	$phraseId    = null;
+	$categoryId  = 1; // categoryId by default always has the id 1. If no categories is specified for the new phrase
+			  // it falls under category named "Te pergjithshme"	
+	$imageId     = null;
 	$img_warning = '';
 
-	$jsonValue = json_encode(0);
+	$jsonValue   = json_encode(0);
 
 	session_start();
 	
@@ -32,19 +33,19 @@
 	    case "1": 
 	    	
 	    	AdminInsertPanel_check();
-		    break; //Break if the first case is matched..
+		    break; 
 		case "2": 
 
 		    AdminSearchPanel_check();
-		    break; //Break if the second case is matched..
+		    break; 
 	    case "3":
 		    
 		    AdminModifyPanel_check();	
-		    break; //Break if the third case is matched..
+		    break; 
 	    case "4":
 
 	    	AdminModifyCategPanel_check();
-	    	break; //Break if the forth case is matched..
+	    	break; 
 	    default:
 	        die ("Go back and Refresh The Page<br>or Close the page and open it again");
 	    }
@@ -71,9 +72,6 @@
 		}
 		elseif (!empty($_POST['kategori'])){
 			$categoryId = addslashes($_POST['kategori']);
-		}
-		else {
-			$categoryId = 1;
 		}	
 
 		if (isset($_FILES['pic']['name']) && !empty($_POST['img-name']) && !is_null($phraseId) && !is_null($categoryId)){
