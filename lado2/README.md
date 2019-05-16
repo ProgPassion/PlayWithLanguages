@@ -7,6 +7,11 @@ Also it is possible to connect a phrase with an image if you are the type of per
 with images. (A more visual learner person).
 The admin always has the possibility to make changes after the insertation (modify or delete phrases or categories or images).
 
+Default Username/Password are:
+---------------------------------------
+Username: lado
+Password: eraldo
+
 Technical description.
 
 This platform is written using only Php, HTML5, CSS, JavaScript.
