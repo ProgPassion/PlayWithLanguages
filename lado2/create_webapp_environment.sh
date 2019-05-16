@@ -18,3 +18,10 @@ mysql -D lado_test -u root -p < lado_db2.sql
 mkdir phrase_images_related
 chown www-data:www-data phrase_images_related
 
+sudo dpkg -l | grep -E '^ii' | grep -q php.*gd && echo "php-gd module seems to be installed! Great.." || echo "Installing php-gd module..." && apt-get install php-gd -y
+
+echo 
+echo
+
+echo "Environment created successfully, you are ready to go!!!! :)"
+
