@@ -24,6 +24,8 @@
 	}
 	else header('Location: .');
 
+
+
     if(isset($_POST['page_form'])) {
 
 		switch ($_POST['page_form']) {
@@ -190,7 +192,7 @@
 
 		global $categoriId;
 
-		if(!empty($_POST['kategori-mod_entity'])) {
+		if(!empty($_POST['kategori-mod_entity']) && $_POST['kategori-mod_entity'] != 1) {
 
     		$categoriId = $_POST['kategori-mod_entity'];
     		if(isset($_POST['categ-delete-butt'])) {
@@ -216,111 +218,21 @@
 <head>
 	<title>Admin</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto|Lato" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
 	<style type="text/css">
-		* {
-			margin: 0;
-			padding: 0;
-		}
-		html, body {
-			height: 100%;
+		
+		html, body, .wrap {
 			min-height: 910px;
-			background-image: url('img/notebook.png');
-			background-repeat: repeat;
-		}
-		p {
-			font-family: 'Lato', sans-serif;
-		}
-		.wrap {
-			width: 930px;
-			height: 100%;
-			min-height: 910px;
-			margin: 0px auto;
-			background: linear-gradient(#07233f, #5598db);
-			padding: 20px 0px;
-			box-sizing: border-box;
-		}
-		.wrapper {
-			width: 720px;
-			margin: 0px auto;
-			box-shadow: 3px 3px 6px rgba(0, 0, 0, 1), 3px 3px 6px rgba(0, 0, 0, 1);
-			border-width:3px;
-			border-style:solid;
-			border-bottom-color:#aaa;
-			border-right-color:#aaa;
-			border-top-color:#efefef;
-			border-left-color:#efefef;
-			border-radius: 3px;
-			background-color: #fff;
-			padding: 15px 25px;
-		}
-		div.first-line-ttl {
-			height: 56px;
-			width: 70%;
-			float: left;
-			overflow: hidden;
-		}
-		h1.tlt {
-			font-family: 'Roboto' , sans-serif;
-			font-size: 48px;
-		}
-		div.first-line-bck {
-			height: 56px;
-			width: 30%;
-			float: right;
-			overflow: hidden;
-
-		}
-		a {
-			text-decoration: none;
-			display: inline-block;
-			font-family: 'Roboto' , sans-serif;
-		}
-		a:link, a:visited {
-			color: #1a4168;
-			text-decoration: none;
-		}
-		a:hover {
-			color: #1c5ea0;
-			text-decoration: underline;
-		}
-		div.first-line-bck a {
-			float: right;
-			margin-right: 30px;
-			margin-top: 20px;
-			font-size: 24px;
-			vertical-align: text-bottom;
-		}
-		p.explain a {
-			font-size: 18px;
 		}
 		
-		hr.style {
-			 border: 0; 
-			 height: 1px; 
-			 background: #333; 
-			 background-image: linear-gradient(to right, #ccc, #333, #ccc);	
-		}
-		.explain {
-			padding-left: 20px;
-			color: #4c4a37; 
-			font-family: 'Source Sans Pro', sans-serif; 
-			font-size: 16px; 
+		.explain { 
 			line-height: 24px;
 			margin-top: 5px; 
 		}
 		.container {
 			overflow: hidden;
 		}
-		.sub-cont1, .sub-cont2, .subm-butt {
-			width: 100%;
-			overflow: hidden;
-		}
-		.optional, .kategori {
-			font-family: 'Lato', sans-serif;
-			float: left;
-			padding: 10px;
-			box-sizing: border-box;
-		}
+		
 		.optional {
 			width: 60%;
 			border-right: 1px dashed #ccc;
@@ -377,19 +289,15 @@
 			height: 30px;
 			cursor: pointer;
 		}
-		.sub-cont2 {
-			font-family: 'Lato', sans-serif;
-		}
+		
 		.modify-type {
 			float: right; 
 		}
 		.shqip, .ang, .turq, .modify-butt, .modify-categ, .empty, .modify-categ-butt {
-			width: 33.3333333%;
-			float: left;
 			margin-top: 10px; 
 			padding: 0px;
-			box-sizing: border-box;
 		}
+		
 		#chk-apr-container, #categ-name-container{
 			float: left;
 			overflow: auto;
@@ -410,30 +318,13 @@
 			width: calc(90% - 4px);
 		}
 		.result {
-			width:90%;
+			
 			height: 120px;
-			background-color: #dedede;
-			border-width:3px;
-			border-style:solid;
-			border-bottom-color:#aaa;
-			border-right-color:#aaa;
-			border-top-color:#efefef;
-			border-left-color:#efefef;
-			border-radius: 5px;
-			margin-top: 10px;
-			padding: 6px 8px;
-			box-sizing: border-box;
-			overflow: auto;
+			/*margin: 0;
+			margin-top: 10px;*/
 		}
-		.result p {
-			line-height: 17px;
-			margin-bottom: 20px;
-			font-family: 'Lato', sans-serif;
-			cursor: pointer;
-		}
+		
 		.result img {
-			width: 100px;
-			display: block;
 			margin: 4px auto;
 		}
 		.struct {
@@ -443,6 +334,7 @@
 		.modify-butt > input[type=submit]{
 			width: 90%;
 			height: 30px;
+			margin-left: 10px;
 			border-radius: 10px;
 			font-family: 'Lato', sans-serif;
 			font-size: 18px;
@@ -451,7 +343,8 @@
 		input[type=submit]:hover {
 			background: linear-gradient(#eee,#999);
 		}
-		.modify-categ > select {
+		select {
+			margin: 0;
 			width: 90%;
 			cursor: pointer;
 		}
@@ -467,61 +360,17 @@
 			padding: 0 10px 0 10px;
 			font-family: 'Lato', sans-serif;
 		}
-		/* The Modal (background) */
-		.modal {
-		    display: none; /* Hidden by default */
-		    position: fixed; /* Stay in place */
-		    z-index: 1; /* Sit on top */
-		    padding-top: 50px; /* Location of the box */
-		    left: 0;
-		    top: 0;
-		    width: 100%; /* Full width */
-		    height: 100%; /* Full height */
-		    overflow: auto; /* Enable scroll if needed */
-		    background-color: rgb(0,0,0); /* Fallback color */
-		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-		}
-		/* Modal Content */
+	
 		.modal-content {
-		    background-color: #fefefe;
-		    margin: auto;
-		    padding: 25px 20px;
-		    border: 1px solid #888;
 		    width: 700px;
 		}
-		/* The Close Button */
-		.close {
-		    color: #aaaaaa;
-		    float: right;
-		    font-size: 28px;
-		    font-weight: bold;
-		}
-		.close:hover,
-		.close:focus {
-		    color: #000;
-		    text-decoration: none;
-		    cursor: pointer;
-		}
-		#infoOnClick {
-		    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-		    border-collapse: collapse;
-		    width: 100%;
-		}
-		#infoOnClick td {
-		    border: 1px solid #ddd;
-		    padding: 8px;
-		}
+		
 		#infoOnClick tr:nth-child(even){background-color: #f2f2f2;}
 		#infoOnClick tr:hover {background-color: #ddd;}
 		#infoOnClick tr:first-child, #infoOnClick tr:nth-child(2), #infoOnClick tr:nth-child(4) {
-			padding-top: 12px;
-		    padding-bottom: 12px;
-		    text-align: left;
-		    background-color: #0059b3;
-		    color: white;
-		    font-size: 20px;
 		    font-weight: bold;
 		}
+
 		#infoOnClick tr:nth-child(2) {
 			background-color: #fefefe;
 		}
