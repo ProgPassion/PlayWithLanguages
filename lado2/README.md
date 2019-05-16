@@ -2,7 +2,7 @@ This is a simple platform that I started as hobby project for a friend of mine.
 He was always interested in learning new languages and wanted to have a simple search engine
 that he could insert words or phrases in different languages and time after that he could search them
 easy by some word/words that he reminds from the inserted phrase.
-The phrases are also if its preferred from the admin to be classified with categories.
+The phrases can also if its preferred from the admin to be classified with categories.
 Also it is possible to connect a phrase with an image if you are the type of person who memorises and connects things
 with images. (A more visual learner person).
 The admin always has the possibility to make changes after the insertation (modify or delete phrases or categories or images).
