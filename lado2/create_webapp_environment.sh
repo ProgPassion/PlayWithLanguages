@@ -13,7 +13,7 @@ echo "During installation the script will prompt for entering the root password 
 
 mysql -u root -p -e "CREATE DATABASE lado"
 
-mysql -D lado_test -u root -p < lado_db.sql
+mysql -D lado -u root -p < lado_db.sql
 
 mkdir phrase_images_related
 chown www-data:www-data phrase_images_related
