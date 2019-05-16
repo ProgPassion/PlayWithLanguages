@@ -44,29 +44,11 @@
 	<title>Eraldo</title>
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Calligraffitti" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="./css/style.css">
 	<style type="text/css">
-		* {
-			margin: 0;
-			padding: 0;
-		}
+		
 		html, body {
-			height: 100%;
 			min-height: 650px;
-			background-image: url('img/notebook.png');
-			border-image-repeat: repeat;
-		}
-		.wrap {
-			width: 930px;
-			height: 100%;
-			background-color: #0080ff;
-			/* For browsers that do not support gradients */
-		    background: -webkit-linear-gradient(#07233f, #5598db); /* For Safari 5.1 to 6.0 */
-		    background: -o-linear-gradient(#07233f, #5598db); /* For Opera 11.1 to 12.0 */
-		    background: -moz-linear-gradient(#07233f, #5598db); /* For Firefox 3.6 to 15 */
-		    background: linear-gradient(#07233f, #5598db); /* Standard syntax (must be last) */
-			margin: 0px auto;
-			padding-top: 20px;
-			box-sizing: border-box;
 		}
 		.wrapper {
 			width: 720px;
@@ -136,41 +118,13 @@
 			border-radius: 7px;
 		}
 
-		/* The Modal (background) */
-		.modal {
-		    display: none; /* Hidden by default */
-		    position: fixed; /* Stay in place */
-		    z-index: 1; /* Sit on top */
-		    padding-top: 50px; /* Location of the box */
-		    left: 0;
-		    top: 0;
-		    width: 100%; /* Full width */
-		    height: 100%; /* Full height */
-		    overflow: auto; /* Enable scroll if needed */
-		    background-color: rgb(0,0,0); /* Fallback color */
-		    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-		}
 		/* Modal Content */
 		.modal-content {
 		    background-color: #ccc;
-		    margin: auto;
-		    padding: 25px 20px;
-		    border: 1px solid #888;
 		    width: 400px;
 		}
 		/* The Close Button */
-		.close {
-		    color: #aaaaaa;
-		    float: right;
-		    font-size: 28px;
-		    font-weight: bold;
-		}
-		.close:hover,
-		.close:focus {
-		    color: #000;
-		    text-decoration: none;
-		    cursor: pointer;
-		}
+
 		.modal-content table {
 			width: 100%;
 			font-family: 'Roboto', sans-serif; 
