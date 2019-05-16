@@ -362,8 +362,7 @@
 		.modal-content {
 		    width: 700px;
 		}
-		
-		#infoOnClick tr:nth-child(even){background-color: #f2f2f2;}
+	
 		#infoOnClick tr:hover {background-color: #ddd;}
 		#infoOnClick tr:first-child, #infoOnClick tr:nth-child(2), #infoOnClick tr:nth-child(4) {
 		    font-weight: bold;
